@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useSubscription } from "@/lib/hooks";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,6 @@ import { PaymentServiceAPI } from "@/lib/api";
 
 export default function SubscriptionDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const { data: subscription, isLoading, error, refetch } = useSubscription(id!);
 
   const [showCancelDialog, setShowCancelDialog] = useState(false);

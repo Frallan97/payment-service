@@ -15,13 +15,18 @@ import type {
 } from "@/types";
 
 export class APIClientError extends Error {
+  code: string;
+  statusCode: number;
+
   constructor(
     message: string,
-    public code: string,
-    public statusCode: number
+    code: string,
+    statusCode: number
   ) {
     super(message);
     this.name = "APIClientError";
+    this.code = code;
+    this.statusCode = statusCode;
   }
 }
 

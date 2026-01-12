@@ -113,6 +113,6 @@ func (rl *RateLimiter) writeRateLimitResponse(w http.ResponseWriter, remaining i
 		http.StatusTooManyRequests,
 	)
 
-	w.Write([]byte(fmt.Sprintf(`{"error":{"code":"%s","message":"%s"},"retry_after":%d}`,
-		err.Code, err.Message, int64(time.Until(resetTime).Seconds()))))
+	_, _ = fmt.Fprintf(w, `{"error":{"code":"%s","message":"%s"},"retry_after":%d}`,
+		err.Code, err.Message, int64(time.Until(resetTime).Seconds()))
 }

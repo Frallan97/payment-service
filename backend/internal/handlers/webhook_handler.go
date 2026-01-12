@@ -86,7 +86,7 @@ func (h *WebhookHandler) HandleStripeWebhook(w http.ResponseWriter, r *http.Requ
 
 	// Return 200 OK to acknowledge receipt
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"received": true}`))
+	_, _ = w.Write([]byte(`{"received": true}`))
 }
 
 // HandleSwishWebhook handles POST /api/webhooks/swish

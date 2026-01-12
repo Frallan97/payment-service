@@ -1,9 +1,6 @@
 package middleware
 
 import (
-	"bytes"
-	"encoding/json"
-	"io"
 	"net/http"
 )
 
@@ -34,39 +31,4 @@ func IdempotencyMiddleware(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
-}
-
-// responseWriter wraps http.ResponseWriter to capture response
-type responseWriter struct {
-	http.ResponseWriter
-	statusCode int
-	body       *bytes.Buffer
-}
-
-func (rw *responseWriter) WriteHeader(code int) {
-	rw.statusCode = code
-	rw.ResponseWriter.WriteHeader(code)
-}
-
-func (rw *responseWriter) Write(b []byte) (int, error) {
-	rw.body.Write(b)
-	return rw.ResponseWriter.Write(b)
-}
-
-// CachedResponse represents a cached idempotent response
-type CachedResponse struct {
-	StatusCode int             `json:"status_code"`
-	Headers    http.Header     `json:"headers"`
-	Body       json.RawMessage `json:"body"`
-}
-
-// readBody safely reads and restores the request body
-func readBody(r *http.Request) ([]byte, error) {
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		return nil, err
-	}
-	// Restore body for downstream handlers
-	r.Body = io.NopCloser(bytes.NewBuffer(body))
-	return body, nil
 }

@@ -105,12 +105,13 @@ secrets:
         name: payment-service-secrets
         key: redis-url
 
-# PostgreSQL dependency (optional - can use external database)
+# PostgreSQL (optional - can use external database)
 postgresql:
   enabled: true
   image:
-    repository: bitnami/postgresql
-    tag: "15.5.0"
+    repository: postgres
+    tag: "15-alpine"
+    pullPolicy: IfNotPresent
   auth:
     username: paymentuser
     password: changeme
@@ -119,6 +120,7 @@ postgresql:
     persistence:
       enabled: true
       size: 8Gi
+      storageClass: ""
   resources:
     requests:
       memory: "256Mi"
@@ -127,18 +129,20 @@ postgresql:
       memory: "512Mi"
       cpu: "500m"
 
-# Redis dependency
+# Redis
 redis:
   enabled: true
   image:
-    repository: bitnami/redis
-    tag: "7.2.4"
+    repository: redis
+    tag: "7-alpine"
+    pullPolicy: IfNotPresent
   auth:
     enabled: false
   master:
     persistence:
       enabled: true
       size: 1Gi
+      storageClass: ""
     resources:
       requests:
         memory: "128Mi"

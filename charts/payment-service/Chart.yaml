@@ -10,3 +10,13 @@ keywords:
   - swish
 maintainers:
   - name: Payment Service Team
+
+dependencies:
+  - name: postgresql
+    version: "15.5.38"
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled
+  - name: redis
+    version: "20.6.0"
+    repository: https://charts.bitnami.com/bitnami
+    condition: redis.enabled

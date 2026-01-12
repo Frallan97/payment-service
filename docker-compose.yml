@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: payment-postgres
+    environment:
+      POSTGRES_DB: paymentdb
+      POSTGRES_USER: paymentuser
+      POSTGRES_PASSWORD: paymentpass
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U paymentuser -d paymentdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: payment-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: payment-backend
+    ports:
+      - "8082:8082"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      PORT: "8082"
+      ENV: development
+      DATABASE_URL: postgresql://paymentuser:paymentpass@postgres:5432/paymentdb?sslmode=disable
+      REDIS_URL: redis://redis:6379
+      STRIPE_API_KEY: ${STRIPE_API_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      SWISH_API_URL: https://mss.swicpc.bankgirot.se/swish-cpcapi
+      SWISH_CERT_PATH: /app/certs/swish.pem
+      SWISH_KEY_PATH: /app/certs/swish.key
+      SWISH_WEBHOOK_SECRET: ${SWISH_WEBHOOK_SECRET}
+      AUTH_SERVICE_URL: http://host.docker.internal:8080
+      ALLOWED_ORIGINS: http://localhost:3000,http://localhost:5173
+    volumes:
+      - ./certs:/app/certs
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:

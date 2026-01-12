@@ -1,0 +1,168 @@
+# Default values for payment-service
+
+replicaCount: 2
+
+image:
+  repository: ghcr.io/frallan97/payment-service
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets:
+  - name: ghcr-pull-secret
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 8080
+  targetPort: 8080
+  annotations: {}
+
+ingress:
+  enabled: true
+  className: "traefik"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: payments.vibeoholic.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: payment-service-tls
+      hosts:
+        - payments.vibeoholic.com
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+env:
+  - name: PORT
+    value: "8080"
+  - name: ENV
+    value: "production"
+  - name: AUTH_SERVICE_URL
+    value: "https://auth.vibeoholic.com"
+  - name: ALLOWED_ORIGINS
+    value: "https://app.vibeoholic.com,https://vibeoholic.com"
+
+# Secrets (should be created separately)
+secrets:
+  - name: STRIPE_API_KEY
+    valueFrom:
+      secretKeyRef:
+        name: payment-service-secrets
+        key: stripe-api-key
+  - name: STRIPE_WEBHOOK_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: payment-service-secrets
+        key: stripe-webhook-secret
+  - name: DATABASE_URL
+    valueFrom:
+      secretKeyRef:
+        name: payment-service-secrets
+        key: database-url
+  - name: REDIS_URL
+    valueFrom:
+      secretKeyRef:
+        name: payment-service-secrets
+        key: redis-url
+
+# PostgreSQL dependency (optional - can use external database)
+postgresql:
+  enabled: true
+  auth:
+    username: paymentuser
+    password: changeme
+    database: paymentdb
+  primary:
+    persistence:
+      enabled: true
+      size: 8Gi
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+# Redis dependency
+redis:
+  enabled: true
+  auth:
+    enabled: false
+  master:
+    persistence:
+      enabled: true
+      size: 1Gi
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "100m"
+      limits:
+        memory: "256Mi"
+        cpu: "200m"
+
+# Health checks
+livenessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+# Service Monitor for Prometheus
+serviceMonitor:
+  enabled: true
+  interval: 30s
+  scrapeTimeout: 10s
+  labels: {}

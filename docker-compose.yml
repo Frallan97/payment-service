@@ -55,9 +55,21 @@ services:
       SWISH_KEY_PATH: /app/certs/swish.key
       SWISH_WEBHOOK_SECRET: ${SWISH_WEBHOOK_SECRET}
       AUTH_SERVICE_URL: http://host.docker.internal:8080
-      ALLOWED_ORIGINS: http://localhost:3000,http://localhost:5173
+      ALLOWED_ORIGINS: http://localhost:3000,http://localhost:5173,http://localhost:3001
     volumes:
       - ./certs:/app/certs
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: payment-frontend
+    ports:
+      - "3001:80"
+    environment:
+      VITE_AUTH_SERVICE_URL: http://localhost:8080
+      VITE_PAYMENT_SERVICE_URL: http://localhost:8082
     restart: unless-stopped
 
 volumes:

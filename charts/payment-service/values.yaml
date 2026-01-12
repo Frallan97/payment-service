@@ -1,11 +1,43 @@
 # Default values for payment-service
 
-replicaCount: 2
+# Backend configuration
+backend:
+  replicaCount: 2
+  image:
+    repository: ghcr.io/frallan97/payment-service-backend
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 8080
+    targetPort: 8080
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
 
-image:
-  repository: ghcr.io/frallan97/payment-service
-  pullPolicy: IfNotPresent
-  tag: "latest"
+# Frontend configuration
+frontend:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: ghcr.io/frallan97/payment-service-frontend
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 80
+  resources:
+    limits:
+      cpu: 200m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 64Mi
 
 imagePullSecrets:
   - name: ghcr-pull-secret
@@ -30,34 +62,21 @@ securityContext:
   runAsNonRoot: true
   runAsUser: 1000
 
-service:
-  type: ClusterIP
-  port: 8080
-  targetPort: 8080
-  annotations: {}
-
 ingress:
   enabled: true
   className: "traefik"
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
-  hosts:
-    - host: payments.vibeoholic.com
-      paths:
-        - path: /
-          pathType: Prefix
-  tls:
-    - secretName: payment-service-tls
-      hosts:
-        - payments.vibeoholic.com
-
-resources:
-  limits:
-    cpu: 500m
-    memory: 512Mi
-  requests:
-    cpu: 250m
-    memory: 256Mi
+  # Backend API ingress
+  backend:
+    host: payments-api.vibeoholic.com
+    tls:
+      secretName: payment-service-backend-tls
+  # Frontend UI ingress
+  frontend:
+    host: payments.vibeoholic.com
+    tls:
+      secretName: payment-service-frontend-tls
 
 autoscaling:
   enabled: false

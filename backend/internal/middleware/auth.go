@@ -14,10 +14,11 @@ import (
 type contextKey string
 
 const (
-	UserIDKey contextKey = "userID"
-	EmailKey  contextKey = "email"
-	NameKey   contextKey = "name"
-	RoleKey   contextKey = "role"
+	UserIDKey       contextKey = "userID"
+	EmailKey        contextKey = "email"
+	NameKey         contextKey = "name"
+	RoleKey         contextKey = "role"
+	IsSuperAdminKey contextKey = "isSuperAdmin"
 )
 
 // AuthMiddleware validates JWT tokens from auth-service
@@ -47,6 +48,7 @@ func AuthMiddleware(publicKey *rsa.PublicKey) func(http.Handler) http.Handler {
 			ctx = context.WithValue(ctx, EmailKey, claims.Email)
 			ctx = context.WithValue(ctx, NameKey, claims.Name)
 			ctx = context.WithValue(ctx, RoleKey, claims.Role)
+			ctx = context.WithValue(ctx, IsSuperAdminKey, claims.IsSuperAdmin)
 
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
@@ -75,4 +77,10 @@ func GetNameFromContext(ctx context.Context) (string, bool) {
 func GetRoleFromContext(ctx context.Context) (string, bool) {
 	role, ok := ctx.Value(RoleKey).(string)
 	return role, ok
+}
+
+// IsSuperAdmin checks if the user is a super admin
+func IsSuperAdmin(ctx context.Context) bool {
+	isSuperAdmin, ok := ctx.Value(IsSuperAdminKey).(bool)
+	return ok && isSuperAdmin
 }

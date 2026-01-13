@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthService } from "./lib/auth";
 import DashboardLayout from "./components/admin/DashboardLayout";
 import LoginPage from "./pages/LoginPage";
+import OAuthCallback from "./components/auth/OAuthCallback";
 import DashboardPage from "./pages/DashboardPage";
 import PaymentsPage from "./pages/PaymentsPage";
 import PaymentDetailPage from "./pages/PaymentDetailPage";
@@ -22,6 +23,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/auth/callback" element={<OAuthCallback />} />
         <Route
           path="/dashboard"
           element={

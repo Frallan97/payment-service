@@ -6,47 +6,72 @@ export interface User {
   email: string;
   name: string;
   role: string;
+  is_super_admin?: boolean;
 }
 
 export interface LoginResponse {
   access_token: string;
-  user: User;
+  refresh_token: string;
 }
 
 export class AuthService {
-  private static TOKEN_KEY = "payment_admin_token";
-  private static USER_KEY = "payment_admin_user";
+  private static ACCESS_TOKEN_KEY = "access_token";
+  private static REFRESH_TOKEN_KEY = "refresh_token";
+  private static USER_KEY = "user";
 
-  static async login(email: string, password: string): Promise<LoginResponse> {
-    const response = await fetch(`${AUTH_SERVICE_URL}/api/auth/login`, {
-      method: "POST",
+  // OAuth Login - redirect to auth-service
+  static initiateOAuthLogin(): void {
+    const redirectUri = `${window.location.origin}/auth/callback`;
+    const authUrl = `${AUTH_SERVICE_URL}/api/auth/google/login?redirect_uri=${encodeURIComponent(redirectUri)}`;
+    window.location.href = authUrl;
+  }
+
+  // Handle OAuth callback
+  static async handleOAuthCallback(accessToken: string, refreshToken: string): Promise<User> {
+    // Store tokens
+    localStorage.setItem(this.ACCESS_TOKEN_KEY, accessToken);
+    localStorage.setItem(this.REFRESH_TOKEN_KEY, refreshToken);
+
+    // Fetch user info from auth-service
+    const user = await this.fetchCurrentUser();
+    localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+
+    return user;
+  }
+
+  // Fetch current user from auth-service
+  private static async fetchCurrentUser(): Promise<User> {
+    const token = this.getAccessToken();
+    if (!token) {
+      throw new Error("No access token available");
+    }
+
+    const response = await fetch(`${AUTH_SERVICE_URL}/api/auth/me`, {
       headers: {
-        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ email, password }),
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error?.message || "Login failed");
+      throw new Error("Failed to fetch user info");
     }
 
-    const data: LoginResponse = await response.json();
-
-    // Store token and user info
-    localStorage.setItem(this.TOKEN_KEY, data.access_token);
-    localStorage.setItem(this.USER_KEY, JSON.stringify(data.user));
-
-    return data;
+    return response.json();
   }
 
   static logout(): void {
-    localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem(this.ACCESS_TOKEN_KEY);
+    localStorage.removeItem(this.REFRESH_TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);
+    window.location.href = "/login";
   }
 
-  static getToken(): string | null {
-    return localStorage.getItem(this.TOKEN_KEY);
+  static getAccessToken(): string | null {
+    return localStorage.getItem(this.ACCESS_TOKEN_KEY);
+  }
+
+  static getRefreshToken(): string | null {
+    return localStorage.getItem(this.REFRESH_TOKEN_KEY);
   }
 
   static getUser(): User | null {
@@ -60,17 +85,13 @@ export class AuthService {
   }
 
   static isAuthenticated(): boolean {
-    const token = this.getToken();
+    const token = this.getAccessToken();
     const user = this.getUser();
-
-    // Check if token exists and user is admin or franssjos@gmail.com
-    if (!token || !user) return false;
-
-    return user.email === "franssjos@gmail.com" || user.role === "admin";
+    return !!(token && user);
   }
 
   static async fetchWithAuth(url: string, options: RequestInit = {}): Promise<Response> {
-    const token = this.getToken();
+    const token = this.getAccessToken();
 
     if (!token) {
       throw new Error("Not authenticated");
@@ -83,6 +104,33 @@ export class AuthService {
       ...options,
       headers,
     });
+  }
+
+  // Refresh access token using refresh token
+  static async refreshAccessToken(): Promise<string> {
+    const refreshToken = this.getRefreshToken();
+    if (!refreshToken) {
+      throw new Error("No refresh token available");
+    }
+
+    const response = await fetch(`${AUTH_SERVICE_URL}/api/auth/refresh`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ refresh_token: refreshToken }),
+    });
+
+    if (!response.ok) {
+      // Refresh failed, clear tokens and redirect to login
+      this.logout();
+      throw new Error("Token refresh failed");
+    }
+
+    const data = await response.json();
+    localStorage.setItem(this.ACCESS_TOKEN_KEY, data.access_token);
+
+    return data.access_token;
   }
 }
 

@@ -14,10 +14,11 @@ import (
 
 // Claims represents JWT claims from auth-service
 type Claims struct {
-	UserID uuid.UUID `json:"sub"`
-	Email  string    `json:"email"`
-	Name   string    `json:"name"`
-	Role   string    `json:"role"`
+	UserID       uuid.UUID `json:"sub"`
+	Email        string    `json:"email"`
+	Name         string    `json:"name"`
+	Role         string    `json:"role"`
+	IsSuperAdmin bool      `json:"is_super_admin"`
 	jwt.RegisteredClaims
 }
 

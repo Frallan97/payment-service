@@ -9,6 +9,7 @@ import PaymentDetailPage from "./pages/PaymentDetailPage";
 import SubscriptionsPage from "./pages/SubscriptionsPage";
 import SubscriptionDetailPage from "./pages/SubscriptionDetailPage";
 import RefundsPage from "./pages/RefundsPage";
+import { ThemeProvider } from "./components/theme-provider";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return AuthService.isAuthenticated() ? (
@@ -20,8 +21,9 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <BrowserRouter>
+        <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/auth/callback" element={<OAuthCallback />} />
         <Route
@@ -39,9 +41,10 @@ function App() {
           <Route path="subscriptions/:id" element={<SubscriptionDetailPage />} />
           <Route path="refunds" element={<RefundsPage />} />
         </Route>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
-    </BrowserRouter>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

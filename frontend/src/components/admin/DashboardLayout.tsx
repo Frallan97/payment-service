@@ -4,6 +4,7 @@ import { AuthService } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
@@ -83,6 +84,7 @@ export default function DashboardLayout() {
                 <p className="text-sm font-medium text-gray-900 truncate">{user?.name}</p>
                 <p className="text-xs text-gray-500 truncate">{user?.email}</p>
               </div>
+              <ThemeToggle />
             </div>
             <Button
               variant="outline"

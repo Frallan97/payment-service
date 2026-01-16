@@ -21,7 +21,7 @@ export class AuthService {
 
   // OAuth Login - redirect to auth-service
   static initiateOAuthLogin(): void {
-    const redirectUri = `${window.location.origin}/auth/callback`;
+    const redirectUri = window.location.origin;
     const authUrl = `${AUTH_SERVICE_URL}/api/auth/google/login?redirect_uri=${encodeURIComponent(redirectUri)}`;
     window.location.href = authUrl;
   }

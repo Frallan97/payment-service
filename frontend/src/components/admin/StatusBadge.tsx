@@ -6,7 +6,7 @@ interface StatusBadgeProps {
 }
 
 export default function StatusBadge({ status }: StatusBadgeProps) {
-  const getVariant = (status: string): "success" | "destructive" | "warning" | "info" | "default" | "secondary" => {
+  const getVariant = (status: string): "success" | "error" | "warning" | "info" | "default" | "secondary" => {
     const lowerStatus = status.toLowerCase();
 
     // Success statuses (green)
@@ -16,7 +16,7 @@ export default function StatusBadge({ status }: StatusBadgeProps) {
 
     // Error statuses (red)
     if (["failed", "canceled", "cancelled", "unpaid"].includes(lowerStatus)) {
-      return "destructive";
+      return "error";
     }
 
     // Warning statuses (yellow/orange)

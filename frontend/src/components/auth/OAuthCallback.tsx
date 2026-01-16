@@ -9,17 +9,17 @@ export default function OAuthCallback() {
   useEffect(() => {
     const handleCallback = async () => {
       const accessToken = searchParams.get('access_token');
-      const refreshToken = searchParams.get('refresh_token');
 
-      if (!accessToken || !refreshToken) {
-        console.error('Missing tokens in callback');
+      if (!accessToken) {
+        console.error('Missing access token in callback');
         navigate('/login?error=auth_failed');
         return;
       }
 
       try {
-        // Store tokens and fetch user info
-        await AuthService.handleOAuthCallback(accessToken, refreshToken);
+        // Store access token and fetch user info
+        // Note: refresh_token is stored as HTTP-only cookie by auth service
+        await AuthService.handleOAuthCallback(accessToken);
         navigate('/dashboard');
       } catch (error) {
         console.error('OAuth callback failed:', error);

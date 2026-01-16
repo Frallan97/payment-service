@@ -27,10 +27,10 @@ export class AuthService {
   }
 
   // Handle OAuth callback
-  static async handleOAuthCallback(accessToken: string, refreshToken: string): Promise<User> {
-    // Store tokens
+  static async handleOAuthCallback(accessToken: string): Promise<User> {
+    // Store access token
+    // Note: refresh_token is stored as HTTP-only cookie by auth service
     localStorage.setItem(this.ACCESS_TOKEN_KEY, accessToken);
-    localStorage.setItem(this.REFRESH_TOKEN_KEY, refreshToken);
 
     // Fetch user info from auth-service
     const user = await this.fetchCurrentUser();
@@ -106,19 +106,14 @@ export class AuthService {
     });
   }
 
-  // Refresh access token using refresh token
+  // Refresh access token using refresh token (from HTTP-only cookie)
   static async refreshAccessToken(): Promise<string> {
-    const refreshToken = this.getRefreshToken();
-    if (!refreshToken) {
-      throw new Error("No refresh token available");
-    }
-
     const response = await fetch(`${AUTH_SERVICE_URL}/api/auth/refresh`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ refresh_token: refreshToken }),
+      credentials: "include", // Send HTTP-only cookie
     });
 
     if (!response.ok) {

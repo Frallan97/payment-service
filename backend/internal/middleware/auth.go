@@ -30,7 +30,7 @@ func AuthMiddleware(publicKey *rsa.PublicKey) func(http.Handler) http.Handler {
 			if authHeader == "" {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusUnauthorized)
-				json.NewEncoder(w).Encode(map[string]interface{}{
+				_ = json.NewEncoder(w).Encode(map[string]interface{}{
 					"error": map[string]interface{}{
 						"code":    "unauthorized",
 						"message": "Missing authorization header",
@@ -43,7 +43,7 @@ func AuthMiddleware(publicKey *rsa.PublicKey) func(http.Handler) http.Handler {
 			if len(parts) != 2 || parts[0] != "Bearer" {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusUnauthorized)
-				json.NewEncoder(w).Encode(map[string]interface{}{
+				_ = json.NewEncoder(w).Encode(map[string]interface{}{
 					"error": map[string]interface{}{
 						"code":    "unauthorized",
 						"message": "Invalid authorization header format",
@@ -56,7 +56,7 @@ func AuthMiddleware(publicKey *rsa.PublicKey) func(http.Handler) http.Handler {
 			if err != nil {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusUnauthorized)
-				json.NewEncoder(w).Encode(map[string]interface{}{
+				_ = json.NewEncoder(w).Encode(map[string]interface{}{
 					"error": map[string]interface{}{
 						"code":    "unauthorized",
 						"message": "Invalid or expired token",

@@ -88,7 +88,6 @@ export default function DashboardLayout() {
             </div>
             <Button
               variant="outline"
-              className="w-full"
               onClick={handleLogout}
               size="sm"
             >

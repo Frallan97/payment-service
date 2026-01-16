@@ -96,7 +96,7 @@ export default function CreateSubscriptionForm({ onSuccess }: CreateSubscription
           Create Subscription
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Create Subscription</DialogTitle>

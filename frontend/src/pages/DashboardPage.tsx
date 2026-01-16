@@ -33,7 +33,7 @@ export default function DashboardPage() {
                 View and manage all payment transactions
               </p>
               <Link to="/dashboard/payments">
-                <Button variant="outline" className="w-full">
+                <Button variant="outline">
                   View Payments
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
@@ -53,7 +53,7 @@ export default function DashboardPage() {
                 Manage recurring subscription billing
               </p>
               <Link to="/dashboard/subscriptions">
-                <Button variant="outline" className="w-full">
+                <Button variant="outline">
                   View Subscriptions
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
@@ -73,7 +73,7 @@ export default function DashboardPage() {
                 Process and track payment refunds
               </p>
               <Link to="/dashboard/refunds">
-                <Button variant="outline" className="w-full">
+                <Button variant="outline">
                   View Refunds
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>

@@ -49,7 +49,16 @@ export class PaymentServiceAPI {
       );
 
       if (!response.ok) {
-        const error: APIError = await response.json();
+        let error: APIError;
+        try {
+          error = await response.json();
+        } catch {
+          // Handle non-JSON error responses (e.g., HTML error pages)
+          error = {
+            code: 'unknown_error',
+            message: `HTTP ${response.status} error`,
+          };
+        }
         throw new APIClientError(error.message, error.code, response.status);
       }
 

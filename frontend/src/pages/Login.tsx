@@ -17,8 +17,9 @@ export default function Login() {
   }, [navigate]);
 
   const handleGoogleLogin = () => {
-    // Redirect to auth-service OAuth flow
-    window.location.href = `${AUTH_SERVICE_URL}/auth/google?redirect_uri=${encodeURIComponent(window.location.origin + '/auth/callback')}`;
+    // Redirect to auth-service frontend which handles OAuth
+    // The auth-service will redirect back to our callback with the token
+    window.location.href = `${AUTH_SERVICE_URL}?redirect_uri=${encodeURIComponent(window.location.origin + '/auth/callback')}`;
   };
 
   return (

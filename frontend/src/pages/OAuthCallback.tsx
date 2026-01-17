@@ -1,48 +1,48 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { AuthService } from '../lib/auth';
 
 export default function OAuthCallback() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const accessToken = searchParams.get('access_token');
-    const error = searchParams.get('error');
+    const errorParam = searchParams.get('error');
 
-    // If this is opened in a popup (has window.opener), send message to parent
-    if (window.opener) {
-      if (accessToken) {
-        window.opener.postMessage(
-          {
-            type: 'AUTH_SUCCESS',
-            accessToken: accessToken,
-          },
-          window.location.origin
-        );
-      } else if (error) {
-        window.opener.postMessage(
-          {
-            type: 'AUTH_ERROR',
-            error: error,
-          },
-          window.location.origin
-        );
-      }
+    if (errorParam) {
+      setError(errorParam);
+      setTimeout(() => navigate('/login'), 3000);
+      return;
+    }
 
-      // Close the popup
-      window.close();
+    if (accessToken) {
+      // Store the token
+      AuthService.setToken(accessToken);
+      // Redirect to dashboard
+      navigate('/dashboard');
     } else {
-      // If not in a popup, this is a direct navigation (e.g., user refreshed)
-      // Redirect to login page
-      navigate('/login');
+      setError('No access token received');
+      setTimeout(() => navigate('/login'), 3000);
     }
   }, [searchParams, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-        <p className="text-muted-foreground">Completing authentication...</p>
+        {error ? (
+          <>
+            <div className="text-red-500 text-xl mb-4">Authentication Error</div>
+            <p className="text-muted-foreground">{error}</p>
+            <p className="text-sm text-muted-foreground mt-2">Redirecting to login...</p>
+          </>
+        ) : (
+          <>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Completing authentication...</p>
+          </>
+        )}
       </div>
     </div>
   );

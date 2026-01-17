@@ -17,16 +17,6 @@ export class AuthService {
     localStorage.removeItem(this.TOKEN_KEY);
   }
 
-  static async login(email: string, password: string): Promise<boolean> {
-    // Simple mock login for now
-    // TODO: Replace with actual API call
-    if (email && password) {
-      this.setToken('mock-token');
-      return true;
-    }
-    return false;
-  }
-
   static logout(): void {
     this.clearToken();
     window.location.href = '/login';

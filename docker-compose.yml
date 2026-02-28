@@ -54,7 +54,7 @@ services:
       SWISH_CERT_PATH: /app/certs/swish.pem
       SWISH_KEY_PATH: /app/certs/swish.key
       SWISH_WEBHOOK_SECRET: ${SWISH_WEBHOOK_SECRET}
-      AUTH_SERVICE_URL: http://host.docker.internal:8080
+      AUTH_SERVICE_URL: ${AUTH_SERVICE_URL:-http://host.docker.internal:8080}
       ALLOWED_ORIGINS: http://localhost:3000,http://localhost:5173,http://localhost:3001
     volumes:
       - ./certs:/app/certs

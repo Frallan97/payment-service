@@ -1,6 +1,10 @@
 package models
 
-import "fmt"
+import (
+	"database/sql/driver"
+	"encoding/json"
+	"fmt"
+)
 
 // Provider represents a payment provider
 type Provider string
@@ -56,6 +60,31 @@ const (
 	RefundStatusFailed     RefundStatus = "failed"
 	RefundStatusCanceled   RefundStatus = "canceled"
 )
+
+// JSONBMap is a map[string]any that implements sql.Scanner and driver.Valuer
+// for PostgreSQL JSONB columns.
+type JSONBMap map[string]any
+
+// Scan implements sql.Scanner for reading JSONB from PostgreSQL.
+func (m *JSONBMap) Scan(value any) error {
+	if value == nil {
+		*m = JSONBMap{}
+		return nil
+	}
+	b, ok := value.([]byte)
+	if !ok {
+		return fmt.Errorf("JSONBMap.Scan: expected []byte, got %T", value)
+	}
+	return json.Unmarshal(b, m)
+}
+
+// Value implements driver.Valuer for writing JSONB to PostgreSQL.
+func (m JSONBMap) Value() (driver.Value, error) {
+	if m == nil {
+		return []byte("{}"), nil
+	}
+	return json.Marshal(m)
+}
 
 // ErrorCode represents API error codes
 type ErrorCode string

@@ -21,7 +21,7 @@ type WebhookEvent struct {
 	LastProcessingError  *string `json:"last_processing_error,omitempty" db:"last_processing_error"`
 
 	// Payload
-	Payload map[string]any `json:"payload" db:"payload"`
+	Payload JSONBMap `json:"payload" db:"payload"`
 
 	// Related entity
 	PaymentID      *uuid.UUID `json:"payment_id,omitempty" db:"payment_id"`

@@ -20,7 +20,7 @@ type Payment struct {
 
 	// Payment method
 	PaymentMethodType    *string        `json:"payment_method_type,omitempty" db:"payment_method_type"`
-	PaymentMethodDetails map[string]any `json:"payment_method_details,omitempty" db:"payment_method_details"`
+	PaymentMethodDetails JSONBMap `json:"payment_method_details,omitempty" db:"payment_method_details"`
 
 	// Description
 	Description         *string `json:"description,omitempty" db:"description"`
@@ -38,7 +38,7 @@ type Payment struct {
 	FailureMessage *string `json:"failure_message,omitempty" db:"failure_message"`
 
 	// Metadata
-	Metadata map[string]any `json:"metadata,omitempty" db:"metadata"`
+	Metadata JSONBMap `json:"metadata,omitempty" db:"metadata"`
 
 	// Idempotency
 	IdempotencyKey *string `json:"idempotency_key,omitempty" db:"idempotency_key"`

@@ -18,7 +18,7 @@ type Customer struct {
 	SwishCustomerID  *string `json:"swish_customer_id,omitempty" db:"swish_customer_id"`
 
 	// Metadata
-	Metadata map[string]any `json:"metadata,omitempty" db:"metadata"`
+	Metadata JSONBMap `json:"metadata,omitempty" db:"metadata"`
 
 	// Timestamps
 	CreatedAt time.Time  `json:"created_at" db:"created_at"`

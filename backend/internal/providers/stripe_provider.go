@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"payment-service/internal/models"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -172,7 +173,7 @@ func mapPaymentIntentToPayment(pi *stripe.PaymentIntent) *models.Payment {
 		Provider:          models.ProviderStripe,
 		ProviderPaymentID: pi.ID,
 		Amount:            pi.Amount,
-		Currency:          models.Currency(pi.Currency),
+		Currency:          models.Currency(strings.ToUpper(string(pi.Currency))),
 		Status:            mapStripeStatus(string(pi.Status)),
 		ClientSecret:      &pi.ClientSecret,
 	}
@@ -325,7 +326,7 @@ func mapStripeSubscription(sub *stripe.Subscription) *models.Subscription {
 		Provider:               models.ProviderStripe,
 		ProviderSubscriptionID: sub.ID,
 		Amount:                 sub.Items.Data[0].Price.UnitAmount,
-		Currency:               models.Currency(sub.Items.Data[0].Price.Currency),
+		Currency:               models.Currency(strings.ToUpper(string(sub.Items.Data[0].Price.Currency))),
 		Interval:               string(sub.Items.Data[0].Price.Recurring.Interval),
 		IntervalCount:          int(sub.Items.Data[0].Price.Recurring.IntervalCount),
 		Status:                 mapStripeSubscriptionStatus(string(sub.Status)),
@@ -382,7 +383,7 @@ func mapStripeRefund(ref *stripe.Refund) *models.Refund {
 		Provider:        models.ProviderStripe,
 		ProviderRefundID: ref.ID,
 		Amount:          ref.Amount,
-		Currency:        models.Currency(ref.Currency),
+		Currency:        models.Currency(strings.ToUpper(string(ref.Currency))),
 		Status:          mapStripeRefundStatus(string(ref.Status)),
 	}
 

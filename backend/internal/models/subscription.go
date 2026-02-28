@@ -41,7 +41,7 @@ type Subscription struct {
 	ProductDescription *string `json:"product_description,omitempty" db:"product_description"`
 
 	// Metadata
-	Metadata map[string]any `json:"metadata,omitempty" db:"metadata"`
+	Metadata JSONBMap `json:"metadata,omitempty" db:"metadata"`
 
 	// Timestamps
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
